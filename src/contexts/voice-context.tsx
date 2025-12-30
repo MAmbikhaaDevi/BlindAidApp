@@ -44,10 +44,6 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
   const [navigate, setNavigateState] = useState<(screen: Screen) => void>(() => () => {});
   const { toast } = useToast();
 
-  const setNavigate = useCallback((fn: (screen: Screen) => void) => {
-    setNavigateState(() => fn);
-  }, []);
-
   const speak = useCallback((text: string, onEnd?: () => void) => {
     if (!text || typeof window === 'undefined' || !window.speechSynthesis) {
         if (onEnd) onEnd();
@@ -85,12 +81,6 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
     if (command.includes("detect") || command.includes("look") || command.includes("scan")) {
       navigate('object-detection');
       speak("Navigating to Object Detection.");
-    } else if (command.includes("read text") || command.includes("what does this say")) {
-      navigate('text-reader');
-      speak("Navigating to Text Reader.");
-    } else if (command.includes("navigate") || command.includes("directions") || command.includes("go to")) {
-      navigate('navigation');
-      speak("Navigating to Navigation.");
     } else if (command.includes("emergency") || command.includes("help") || command.includes("sos")) {
       navigate('emergency');
       speak("Navigating to Emergency SOS.");
@@ -109,6 +99,10 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       return; 
     }
   }, [navigate, toast, speak]);
+
+  const setNavigate = useCallback((fn: (screen: Screen) => void) => {
+    setNavigateState(() => fn);
+  }, []);
 
   useEffect(() => {
     const SpeechRecognition = (window as IWindow).SpeechRecognition || (window as IWindow).webkitSpeechRecognition;
@@ -133,7 +127,6 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       };
 
       rec.onerror = (event: any) => {
-        console.error("Speech recognition error", event.error);
         if (event.error !== 'no-speech') {
             toast({
                 title: "Voice Error",
@@ -153,7 +146,6 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       setRecognition(rec);
     } else {
       setIsSupported(false);
-      console.warn("Speech recognition not supported in this browser.");
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleCommand]); 
@@ -165,7 +157,6 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       try {
         recognition.start();
       } catch (error) {
-        console.error("Could not start recognition:", error);
         if((error as Error).name === 'InvalidStateError') {
           // It's already started, do nothing.
         } else {

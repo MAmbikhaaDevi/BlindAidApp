@@ -6,14 +6,12 @@ import { Home, Scan, FileText, Map, Settings, AlertTriangle } from 'lucide-react
 import { VoiceProvider } from '@/contexts/voice-context';
 import { DashboardScreen } from '@/components/screens/dashboard';
 import { ObjectDetectionScreen } from '@/components/screens/object-detection';
-import { TextReaderScreen } from '@/components/screens/text-reader';
-import { NavigationScreen } from '@/components/screens/navigation';
 import { EmergencyScreen } from '@/components/screens/emergency';
 import { SettingsScreen } from '@/components/screens/settings';
 import { VoiceController } from '@/components/voice-controller';
 import { useVoice } from '@/contexts/voice-context';
 
-export type Screen = 'dashboard' | 'object-detection' | 'text-reader' | 'navigation' | 'emergency' | 'settings';
+export type Screen = 'dashboard' | 'object-detection' | 'emergency' | 'settings';
 
 
 function AppContent() {
@@ -32,10 +30,6 @@ function AppContent() {
     switch (currentScreen) {
       case 'object-detection':
         return ObjectDetectionScreen;
-      case 'text-reader':
-        return TextReaderScreen;
-      case 'navigation':
-        return NavigationScreen;
       case 'emergency':
         return EmergencyScreen;
       case 'settings':
@@ -49,8 +43,6 @@ function AppContent() {
   const screenTitle = useMemo(() => {
     switch (currentScreen) {
       case 'object-detection': return "Object Detection";
-      case 'text-reader': return "Text Reader";
-      case 'navigation': return "Navigation";
       case 'emergency': return "Emergency SOS";
       case 'settings': return "Settings";
       case 'dashboard':
@@ -80,8 +72,6 @@ function AppContent() {
           <footer className="absolute bottom-0 left-0 right-0 flex justify-around items-center p-2 border-t bg-card/80 backdrop-blur-sm">
             <NavButton icon={Home} label="Home" screen="dashboard" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Scan} label="Detect" screen="object-detection" currentScreen={currentScreen} navigate={setCurrentScreen} />
-            <NavButton icon={FileText} label="Read" screen="text-reader" currentScreen={currentScreen} navigate={setCurrentScreen} />
-            <NavButton icon={Map} label="Navigate" screen="navigation" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={AlertTriangle} label="SOS" screen="emergency" currentScreen={currentScreen} navigate={setCurrentScreen} />
           </footer>
 

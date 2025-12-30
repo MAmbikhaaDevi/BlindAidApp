@@ -7,12 +7,6 @@
       "imageHint": "city street"
     },
     {
-      "id": "text-document",
-      "description": "A close-up of a printed document with several paragraphs of text.",
-      "imageUrl": "https://images.unsplash.com/photo-1759936660196-93106b9a5b55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHx0ZXh0JTIwZG9jdW1lbnR8ZW58MHx8fHwxNzY3MDcyMzUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "text document"
-    },
-    {
       "id": "signboard",
       "description": "A store sign with large, clear letters.",
       "imageUrl": "https://images.unsplash.com/photo-1740829436544-166d2861e46f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzdG9yZSUyMHNpZ258ZW58MHx8fHwxNzY3MDcyMzUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
