@@ -4,6 +4,7 @@
 import { useToast } from "@/hooks/use-toast";
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { type Screen } from '@/app/page';
+import { answerQuestion } from "@/ai/flows/answer-question";
 
 interface IWindow extends Window {
   SpeechRecognition: any;
@@ -74,30 +75,44 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
     window.speechSynthesis.cancel();
     setTimeout(() => window.speechSynthesis.speak(utterance), 50);
   }, [status]);
-
-  const handleCommand = useCallback((command: string) => {
-    console.log("Handling command:", command);
-
-    if (command.includes("detect") || command.includes("look") || command.includes("scan")) {
-      navigate('object-detection');
-      speak("Navigating to Object Detection.");
-    } else if (command.includes("emergency") || command.includes("help") || command.includes("sos")) {
-      navigate('emergency');
-      speak("Navigating to Emergency SOS.");
-    } else if (command.includes("home") || command.includes("dashboard")) {
-      navigate('dashboard');
-      speak("Returning to dashboard.");
-    } else {
-      const spokenResponse = `Sorry, I didn't understand the command '${command}'.`;
-      toast({ title: "Unknown Command", description: `You said: "${command}"`});
-      speak(spokenResponse);
-      return; 
-    }
-  }, [navigate, toast, speak]);
-
+  
   const setNavigate = useCallback((fn: (screen: Screen) => void) => {
     setNavigateState(() => fn);
   }, []);
+
+  const handleCommand = useCallback(async (command: string) => {
+    console.log("Handling command:", command);
+    setStatus("processing");
+
+    const lowerCaseCommand = command.toLowerCase();
+
+    if (lowerCaseCommand.includes("detect") || lowerCaseCommand.includes("look") || lowerCaseCommand.includes("scan")) {
+      navigate('object-detection');
+      speak("Navigating to Object Detection.");
+    } else if (lowerCaseCommand.includes("emergency") || lowerCaseCommand.includes("help") || lowerCaseCommand.includes("sos")) {
+      navigate('emergency');
+      speak("Navigating to Emergency SOS.");
+    } else if (lowerCaseCommand.includes("home") || lowerCaseCommand.includes("dashboard")) {
+      navigate('dashboard');
+      speak("Returning to dashboard.");
+    } else if (lowerCaseCommand.includes("cancel") || lowerCaseCommand.includes("stop")) {
+        // This is a special command that might be used in other screens (like SOS)
+        // We can just speak a confirmation and let the screen handle its state.
+        speak("Cancelled.");
+        setStatus('idle');
+    } else {
+        try {
+            const { response } = await answerQuestion({ query: command });
+            speak(response);
+        } catch (error) {
+            console.error("Error answering question:", error);
+            const errorMessage = "Sorry, I had trouble understanding that.";
+            speak(errorMessage);
+            toast({ title: "AI Error", description: errorMessage, variant: "destructive" });
+        }
+    }
+  }, [navigate, speak, toast]);
+
 
   useEffect(() => {
     const SpeechRecognition = (window as IWindow).SpeechRecognition || (window as IWindow).webkitSpeechRecognition;
@@ -115,14 +130,13 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       };
 
       rec.onresult = (event: any) => {
-        const currentTranscript = event.results[0][0].transcript.toLowerCase().trim();
+        const currentTranscript = event.results[0][0].transcript.trim();
         setTranscript(currentTranscript);
-        setStatus("processing");
         handleCommand(currentTranscript);
       };
 
       rec.onerror = (event: any) => {
-        if (event.error !== 'no-speech') {
+        if (event.error !== 'no-speech' && event.error !== 'aborted') {
             toast({
                 title: "Voice Error",
                 description: `Could not understand. Error: ${event.error}`,
@@ -155,6 +169,7 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
         if((error as Error).name === 'InvalidStateError') {
           // It's already started, do nothing.
         } else {
+            console.error("Speech recognition start error:", error);
             setStatus("idle");
         }
       }
