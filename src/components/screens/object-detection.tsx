@@ -81,7 +81,7 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
   
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      speak("Object detection ready. Press the Scan button to analyze your surroundings.");
+      speak("Object detection ready. Say 'scan surroundings' to analyze the scene.");
     }, 500);
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps

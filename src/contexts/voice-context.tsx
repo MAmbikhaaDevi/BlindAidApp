@@ -76,9 +76,9 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
     setTimeout(() => window.speechSynthesis.speak(utterance), 50);
   }, [status]);
   
-  const setNavigate = useCallback((fn: (screen: Screen) => void) => {
+  const setNavigate = (fn: (screen: Screen) => void) => {
     setNavigateState(() => fn);
-  }, []);
+  };
 
   const handleCommand = useCallback(async (command: string) => {
     console.log("Handling command:", command);
@@ -88,13 +88,10 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
 
     if (lowerCaseCommand.includes("detect") || lowerCaseCommand.includes("look") || lowerCaseCommand.includes("scan")) {
       navigate('object-detection');
-      speak("Navigating to Object Detection.");
     } else if (lowerCaseCommand.includes("emergency") || lowerCaseCommand.includes("help") || lowerCaseCommand.includes("sos")) {
       navigate('emergency');
-      speak("Navigating to Emergency SOS.");
     } else if (lowerCaseCommand.includes("home") || lowerCaseCommand.includes("dashboard")) {
       navigate('dashboard');
-      speak("Returning to dashboard.");
     } else if (lowerCaseCommand.includes("cancel") || lowerCaseCommand.includes("stop")) {
         // This is a special command that might be used in other screens (like SOS)
         // We can just speak a confirmation and let the screen handle its state.

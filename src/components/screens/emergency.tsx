@@ -39,7 +39,7 @@ export const EmergencyScreen: React.FC<ScreenProps> = ({ navigate }) => {
   
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-        speak("Emergency screen. Press the activate S O S button to start the countdown.");
+        speak("Emergency screen. Say 'activate S O S' to start the countdown.");
     }, 500);
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
