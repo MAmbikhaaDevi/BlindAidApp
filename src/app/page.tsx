@@ -2,15 +2,16 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Home, Scan, AlertTriangle } from 'lucide-react';
+import { Home, Scan, AlertTriangle, Settings } from 'lucide-react';
 import { VoiceProvider } from '@/contexts/voice-context';
 import { DashboardScreen } from '@/components/screens/dashboard';
 import { ObjectDetectionScreen } from '@/components/screens/object-detection';
 import { EmergencyScreen } from '@/components/screens/emergency';
+import { SettingsScreen } from '@/components/screens/settings';
 import { VoiceController } from '@/components/voice-controller';
 import { useVoice } from '@/contexts/voice-context';
 
-export type Screen = 'dashboard' | 'object-detection' | 'emergency';
+export type Screen = 'dashboard' | 'object-detection' | 'emergency' | 'settings';
 
 
 function AppContent() {
@@ -33,6 +34,8 @@ function AppContent() {
         return ObjectDetectionScreen;
       case 'emergency':
         return EmergencyScreen;
+      case 'settings':
+        return SettingsScreen;
       case 'dashboard':
       default:
         return DashboardScreen;
@@ -43,6 +46,7 @@ function AppContent() {
     switch (currentScreen) {
       case 'object-detection': return "Object Detection";
       case 'emergency': return "Emergency SOS";
+      case 'settings': return "Settings";
       case 'dashboard':
       default:
         return "BLIND AID";
@@ -71,6 +75,7 @@ function AppContent() {
             <NavButton icon={Home} label="Home" screen="dashboard" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Scan} label="Detect" screen="object-detection" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={AlertTriangle} label="SOS" screen="emergency" currentScreen={currentScreen} navigate={setCurrentScreen} />
+            <NavButton icon={Settings} label="Settings" screen="settings" currentScreen={currentScreen} navigate={setCurrentScreen} />
           </footer>
 
         </div>

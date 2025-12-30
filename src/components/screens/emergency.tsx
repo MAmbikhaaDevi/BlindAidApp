@@ -14,7 +14,7 @@ interface ScreenProps {
 export const EmergencyScreen: React.FC<ScreenProps> = ({ navigate }) => {
   const [sosState, setSosState] = useState<"idle" | "counting" | "sent">("idle");
   const [progress, setProgress] = useState(0);
-  const { speak } = useVoice();
+  const { speak, toast } = useVoice();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -31,15 +31,15 @@ export const EmergencyScreen: React.FC<ScreenProps> = ({ navigate }) => {
           return prev + 20;
         });
       }, 1000);
-      return () => {
-        if(timerRef.current) clearInterval(timerRef.current);
-      };
     }
+    return () => {
+      if(timerRef.current) clearInterval(timerRef.current);
+    };
   }, [sosState, speak]);
   
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-        speak("Emergency screen. Say 'activate S O S' to start the countdown.");
+        speak("Emergency screen. Say 'activate S O S' to start the countdown. Or say 'call' followed by a contact's name.");
     }, 500);
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,9 +58,19 @@ export const EmergencyScreen: React.FC<ScreenProps> = ({ navigate }) => {
     setProgress(0);
     speak("SOS cancelled.");
   };
+  
+  const handleCall = (contactName: string, phoneNumber: string) => {
+    speak(`Calling ${contactName}.`);
+    // Web browsers cannot initiate actual phone calls for security reasons.
+    // We can show a toast notification to simulate the action.
+    toast({
+        title: `Calling ${contactName}`,
+        description: `Dialing ${phoneNumber}... (This is a simulation)`,
+    });
+  }
 
   return (
-    <div className="p-4 space-y-6 text-center">
+    <div className="p-4 space-y-6 text-center fade-in">
       <div className="flex flex-col items-center text-destructive">
         <AlertTriangle className="w-20 h-20" />
         <h2 className="text-3xl font-headline font-bold mt-2">EMERGENCY SOS</h2>
@@ -103,14 +113,18 @@ export const EmergencyScreen: React.FC<ScreenProps> = ({ navigate }) => {
           <CardTitle>Emergency Contacts</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
-            <div className="flex items-center justify-between p-2 rounded-md bg-card">
-                <span>Jane Doe</span>
-                <Phone className="w-4 h-4" />
-            </div>
-             <div className="flex items-center justify-between p-2 rounded-md bg-card">
-                <span>Emergency Services</span>
-                <Phone className="w-4 h-4" />
-            </div>
+            <button className="w-full text-left" onClick={() => handleCall('Jane Doe', '555-123-4567')}>
+                <div className="flex items-center justify-between p-3 rounded-md bg-card hover:bg-primary/10 transition-colors">
+                    <span>Jane Doe</span>
+                    <Phone className="w-5 h-5 text-primary" />
+                </div>
+            </button>
+             <button className="w-full text-left" onClick={() => handleCall('Emergency Services', '911')}>
+                <div className="flex items-center justify-between p-3 rounded-md bg-card hover:bg-primary/10 transition-colors">
+                    <span>Emergency Services</span>
+                    <Phone className="w-5 h-5 text-primary" />
+                </div>
+            </button>
         </CardContent>
       </Card>
     </div>

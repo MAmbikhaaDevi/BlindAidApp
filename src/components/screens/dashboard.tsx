@@ -14,7 +14,7 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ navigate }) => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      speak("Welcome to BLIND AID. You are on the dashboard. You can say 'Detect objects' or 'Emergency'.");
+      speak("Welcome to BLIND AID. You are on the dashboard. You can say 'Detect objects', 'Emergency', or 'Settings'.");
     }, 500);
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -22,7 +22,7 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ navigate }) => {
 
   const features = [
     { title: "Detect Objects", description: "Identify objects in your surroundings.", icon: Scan, screen: "object-detection" },
-    // { title: "Settings", description: "Customize your experience.", icon: Settings, screen: "settings" },
+    { title: "Settings", description: "Customize your experience.", icon: Settings, screen: "settings" },
   ];
 
   return (

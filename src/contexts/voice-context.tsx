@@ -21,6 +21,7 @@ interface VoiceContextType {
   speak: (text: string, onEnd?: () => void) => void;
   isSupported: boolean;
   setNavigate: (fn: (screen: Screen) => void) => void;
+  toast: (options: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
 }
 
 const VoiceContext = createContext<VoiceContextType | undefined>(undefined);
@@ -61,8 +62,6 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       if (onEnd) onEnd();
     };
     utterance.onerror = (e) => {
-      // This error is often a browser quirk and not a critical app error.
-      // The retry logic below handles it.
       setStatus("idle");
       if (onEnd) onEnd();
       
@@ -76,9 +75,9 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
     setTimeout(() => window.speechSynthesis.speak(utterance), 50);
   }, [status]);
   
-  const setNavigate = (fn: (screen: Screen) => void) => {
+  const setNavigate = useCallback((fn: (screen: Screen) => void) => {
     setNavigateState(() => fn);
-  };
+  }, []);
 
   const handleCommand = useCallback(async (command: string) => {
     console.log("Handling command:", command);
@@ -92,11 +91,27 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       navigate('emergency');
     } else if (lowerCaseCommand.includes("home") || lowerCaseCommand.includes("dashboard")) {
       navigate('dashboard');
+    } else if (lowerCaseCommand.includes("settings") || lowerCaseCommand.includes("preference")) {
+        navigate('settings');
     } else if (lowerCaseCommand.includes("cancel") || lowerCaseCommand.includes("stop")) {
-        // This is a special command that might be used in other screens (like SOS)
-        // We can just speak a confirmation and let the screen handle its state.
         speak("Cancelled.");
         setStatus('idle');
+    } else if (lowerCaseCommand.startsWith("call")) {
+        const contactName = lowerCaseCommand.replace("call", "").trim();
+        if (contactName) {
+            // This is a simulation. In a real app, you would look up the contact number.
+            if (contactName.includes("jane")) {
+                speak("Calling Jane Doe.");
+                toast({ title: "Calling Jane Doe", description: "Dialing 555-123-4567... (Simulation)" });
+            } else if (contactName.includes("emergency") || contactName.includes("911")) {
+                speak("Calling Emergency Services.");
+                toast({ title: "Calling Emergency Services", description: "Dialing 911... (Simulation)" });
+            } else {
+                speak(`Sorry, I couldn't find a contact named ${contactName}.`);
+            }
+        } else {
+            speak("Please specify who you want to call.");
+        }
     } else {
         try {
             const { response } = await answerQuestion({ query: command });
@@ -179,7 +194,7 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
     }
   }, [recognition, status]);
 
-  const value = { status, transcript, startListening, stopListening, speak, isSupported, setNavigate };
+  const value = { status, transcript, startListening, stopListening, speak, isSupported, setNavigate, toast };
 
   return <VoiceContext.Provider value={value}>{children}</VoiceContext.Provider>;
 };

@@ -35,7 +35,7 @@ export const SettingsScreen: React.FC<ScreenProps> = ({ navigate }) => {
     }, []);
 
   return (
-    <div className="p-4 space-y-6">
+    <div className="p-4 space-y-6 fade-in">
         <Card>
             <CardHeader>
                 <CardTitle>Voice Settings</CardTitle>
@@ -51,15 +51,15 @@ export const SettingsScreen: React.FC<ScreenProps> = ({ navigate }) => {
                     </div>
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="language">Language</Label>
+                    <Label htmlFor="language">Language & Voice</Label>
                     <Select defaultValue="en-us">
                         <SelectTrigger id="language">
                             <SelectValue placeholder="Select language" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="en-us">English (US)</SelectItem>
-                            <SelectItem value="en-gb">English (UK)</SelectItem>
-                            <SelectItem value="es-es">Español</SelectItem>
+                            <SelectItem value="en-us">English (US) - Default</SelectItem>
+                            <SelectItem value="en-gb">English (UK) - Female</SelectItem>
+                            <SelectItem value="es-es">Español - Male</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -91,7 +91,7 @@ export const SettingsScreen: React.FC<ScreenProps> = ({ navigate }) => {
             </CardContent>
         </Card>
 
-        <Button onClick={handleSave} className="w-full">
+        <Button onClick={handleSave} className="w-full h-12 text-lg">
             Save Settings
         </Button>
     </div>
