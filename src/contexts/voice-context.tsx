@@ -64,13 +64,13 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       if (onEnd) onEnd();
     };
     utterance.onerror = (e) => {
-      console.error("Speech synthesis error", e);
+      // This error is often a browser quirk and not a critical app error.
+      // The retry logic below handles it.
       setStatus("idle");
       if (onEnd) onEnd();
       
       // Fallback for some browsers that error out for no reason
       if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
-          console.log("Retrying speech synthesis");
           setTimeout(() => window.speechSynthesis.speak(utterance), 100);
       }
     };
