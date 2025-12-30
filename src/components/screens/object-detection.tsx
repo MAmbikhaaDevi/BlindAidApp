@@ -3,21 +3,18 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ScanLine, Camera, SwitchCamera, ListTree } from "lucide-react";
-import { identifyAndDescribeObjects, type IdentifyAndDescribeObjectsOutput } from "@/ai/flows/identify-and-describe-objects";
+import { describeImage, type DescribeImageOutput } from "@/ai/flows/describe-image-in-detail";
 import { useVoice } from "@/contexts/voice-context";
 import type { Screen } from "@/app/page";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface ScreenProps {
   navigate: (screen: Screen) => void;
 }
 
-type IdentifiedObject = IdentifyAndDescribeObjectsOutput['objects'][0];
-
 export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
-  const [detectedObjects, setDetectedObjects] = useState<IdentifiedObject[]>([]);
+  const [detectionResult, setDetectionResult] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { speak } = useVoice();
   const { toast } = useToast();
@@ -98,7 +95,7 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
   const handleDetection = async () => {
     if (!videoRef.current || !hasCameraPermission) return;
     setIsLoading(true);
-    setDetectedObjects([]);
+    setDetectionResult(null);
     speak("Scanning your surroundings.");
 
     const canvas = document.createElement('canvas');
@@ -115,12 +112,9 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
       const dataUri = canvas.toDataURL('image/jpeg');
       
       try {
-        const result = await identifyAndDescribeObjects({ photoDataUri: dataUri });
-        setDetectedObjects(result.objects);
-        const summary = result.objects.length > 0
-          ? `I found ${result.objects.length} objects. The main objects are: ${result.objects.map(o => o.name).slice(0,3).join(', ')}.`
-          : "I could not identify any objects in the scene.";
-        speak(`Detection complete. ${summary}`);
+        const result = await describeImage({ photoDataUri: dataUri });
+        setDetectionResult(result.description);
+        speak(`Detection complete. ${result.description}`);
       } catch (error) {
           console.error("Error identifying objects:", error);
           const errorMessage = "Sorry, I couldn't analyze the scene.";
@@ -169,25 +163,16 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
         {isLoading ? "Scanning..." : "Scan Surroundings"}
       </Button>
 
-      {detectedObjects.length > 0 && (
+      {detectionResult && (
          <Card className="fade-in">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-primary">
                   <ListTree />
-                  Detected Objects
+                  Scene Description
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <Accordion type="single" collapsible className="w-full">
-                    {detectedObjects.map((obj, index) => (
-                        <AccordionItem value={`item-${index}`} key={index}>
-                            <AccordionTrigger className="text-lg font-semibold">{obj.name}</AccordionTrigger>
-                            <AccordionContent className="text-base text-muted-foreground">
-                                {obj.description}
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
-                </Accordion>
+                <p className="text-base text-muted-foreground">{detectionResult}</p>
             </CardContent>
          </Card>
       )}
