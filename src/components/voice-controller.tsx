@@ -2,6 +2,7 @@
 
 import { useVoice } from "@/contexts/voice-context";
 import { Mic, MicOff, Loader, Bot } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function VoiceController() {
   const { status, transcript, startListening, isSupported } = useVoice();
@@ -9,7 +10,7 @@ export function VoiceController() {
   const getStatusInfo = () => {
     switch (status) {
       case "listening":
-        return { icon: <Mic className="animate-pulse text-destructive" />, text: "Listening..." };
+        return { icon: <Mic className="text-destructive" />, text: "Listening..." };
       case "processing":
         return { icon: <Loader className="animate-spin" />, text: "Processing..." };
       case "speaking":
@@ -38,14 +39,20 @@ export function VoiceController() {
       <button
         onClick={startListening}
         disabled={status !== "idle"}
-        className="w-24 h-24 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg transition-transform duration-200 active:scale-95 disabled:opacity-50 pointer-events-auto"
+        className={cn(
+            "w-24 h-24 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg transition-all duration-200 active:scale-95 disabled:opacity-50 pointer-events-auto relative",
+            status === 'listening' && 'scale-110'
+        )}
         aria-label="Activate voice command"
       >
-        <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+        {status === 'listening' && (
+            <div className="absolute inset-0 rounded-full bg-primary/50 animate-ping"></div>
+        )}
+        <div className="relative w-20 h-20 rounded-full bg-background/50 flex items-center justify-center text-primary">
           {icon}
         </div>
       </button>
-      <div className="min-h-[2.5rem] bg-black/30 backdrop-blur-sm rounded-full px-4 py-2 text-center">
+      <div className="min-h-[2.5rem] bg-black/30 backdrop-blur-sm rounded-full px-4 py-2 text-center transition-all duration-300">
         <p className="text-sm font-medium text-white">{transcript ? `"${transcript}"` : text}</p>
       </div>
     </div>

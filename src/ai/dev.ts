@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/summarize-nearby-objects.ts';
 import '@/ai/flows/describe-image-in-detail.ts';
+import '@/ai/flows/identify-objects.ts';

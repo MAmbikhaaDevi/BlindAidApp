@@ -2,19 +2,20 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, ScanLine } from "lucide-react";
-import { describeImage } from "@/ai/flows/describe-image-in-detail";
+import { Loader2, ScanLine, Tag } from "lucide-react";
+import { identifyObjectsInImage } from "@/ai/flows/identify-objects";
 import { useVoice } from "@/contexts/voice-context";
 import type { Screen } from "@/app/page";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 
 interface ScreenProps {
   navigate: (screen: Screen) => void;
 }
 
 export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
-  const [description, setDescription] = useState("");
+  const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { speak } = useVoice();
   const { toast } = useToast();
@@ -63,7 +64,7 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
   const handleDetection = async () => {
     if (!videoRef.current) return;
     setIsLoading(true);
-    setDescription("");
+    setDetectedObjects([]);
     speak("Scanning your surroundings.");
 
     const canvas = document.createElement('canvas');
@@ -75,11 +76,12 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
         const dataUri = canvas.toDataURL('image/jpeg');
         
         try {
-            const result = await describeImage({ photoDataUri: dataUri });
-            setDescription(result.description);
-            speak(`Detection complete. ${result.description}.`);
+            const result = await identifyObjectsInImage({ photoDataUri: dataUri });
+            setDetectedObjects(result.objects);
+            const summary = `I see ${result.objects.length} objects. They are: ${result.objects.join(', ')}.`;
+            speak(`Detection complete. ${summary}`);
         } catch (error) {
-            console.error("Error describing image:", error);
+            console.error("Error identifying objects:", error);
             const errorMessage = "Sorry, I couldn't analyze the scene.";
             speak(errorMessage);
             toast({ title: "AI Error", description: errorMessage, variant: "destructive" });
@@ -92,23 +94,20 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4 fade-in">
       <Card>
-        <CardHeader>
-          <CardTitle>Camera View</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="relative w-full aspect-[9/16] rounded-lg overflow-hidden bg-gray-700">
+        <CardContent className="p-2">
+          <div className="relative w-full aspect-[9/16] rounded-lg overflow-hidden bg-gray-900">
              <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
              {isLoading && (
-              <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center">
-                <ScanLine className="w-24 h-24 text-primary animate-ping" />
-                <p className="text-primary font-bold mt-4">Scanning...</p>
+              <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center">
+                <ScanLine className="w-24 h-24 text-primary animate-pulse" style={{ animationDuration: '2s'}} />
+                <p className="text-primary font-bold mt-4 text-lg tracking-wider">Scanning...</p>
               </div>
             )}
             {hasCameraPermission === false && (
-                <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-                    <Alert variant="destructive" className="w-auto">
+                <div className="absolute inset-0 bg-black/80 flex items-center justify-center p-4">
+                    <Alert variant="destructive">
                         <AlertTitle>Camera Access Required</AlertTitle>
                         <AlertDescription>
                             Please allow camera access to use this feature.
@@ -120,18 +119,25 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
         </CardContent>
       </Card>
       
-      <Button onClick={handleDetection} disabled={isLoading || !hasCameraPermission} className="w-full h-14">
-        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ScanLine className="mr-2 h-4 w-4" />}
+      <Button onClick={handleDetection} disabled={isLoading || !hasCameraPermission} className="w-full h-16 text-lg">
+        {isLoading ? <Loader2 className="mr-2 h-6 w-6 animate-spin" /> : <ScanLine className="mr-2 h-6 w-6" />}
         {isLoading ? "Scanning..." : "Scan Surroundings"}
       </Button>
 
-      {description && (
-         <Card>
+      {detectedObjects.length > 0 && (
+         <Card className="fade-in">
             <CardHeader>
-                <CardTitle>Summary</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Tag />
+                  Detected Objects
+                </CardTitle>
             </CardHeader>
             <CardContent>
-                <p>{description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {detectedObjects.map((obj, index) => (
+                    <Badge key={index} variant="secondary" className="text-base px-3 py-1">{obj}</Badge>
+                  ))}
+                </div>
             </CardContent>
          </Card>
       )}

@@ -47,7 +47,7 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
   const speak = useCallback((text: string, onEnd?: () => void) => {
     if (!text || typeof window === 'undefined' || !window.speechSynthesis) {
         if (onEnd) onEnd();
-        setStatus("idle");
+        if (status === 'speaking') setStatus("idle");
         return;
     };
     
@@ -72,8 +72,8 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
     };
 
     window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  }, []);
+    setTimeout(() => window.speechSynthesis.speak(utterance), 50);
+  }, [status]);
 
   const handleCommand = useCallback((command: string) => {
     console.log("Handling command:", command);
@@ -84,18 +84,13 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
     } else if (command.includes("emergency") || command.includes("help") || command.includes("sos")) {
       navigate('emergency');
       speak("Navigating to Emergency SOS.");
-    } else if (command.includes("settings")) {
-      navigate('settings');
-      speak("Navigating to Settings.");
     } else if (command.includes("home") || command.includes("dashboard")) {
       navigate('dashboard');
       speak("Returning to dashboard.");
     } else {
       const spokenResponse = `Sorry, I didn't understand the command '${command}'.`;
       toast({ title: "Unknown Command", description: `You said: "${command}"`});
-      speak(spokenResponse, () => {
-          setStatus("idle");
-      });
+      speak(spokenResponse);
       return; 
     }
   }, [navigate, toast, speak]);
