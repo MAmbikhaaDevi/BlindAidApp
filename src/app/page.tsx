@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Home, Scan, FileText, Map, Settings, AlertTriangle } from 'lucide-react';
 import { VoiceProvider } from '@/contexts/voice-context';
 import { DashboardScreen } from '@/components/screens/dashboard';
@@ -10,11 +10,22 @@ import { NavigationScreen } from '@/components/screens/navigation';
 import { EmergencyScreen } from '@/components/screens/emergency';
 import { SettingsScreen } from '@/components/screens/settings';
 import { VoiceController } from '@/components/voice-controller';
+import { useVoice } from '@/contexts/voice-context';
 
 export type Screen = 'dashboard' | 'object-detection' | 'text-reader' | 'navigation' | 'emergency' | 'settings';
 
-export default function App() {
+
+function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('dashboard');
+  const { setNavigate } = useVoice();
+
+  const navigate = useCallback((screen: Screen) => {
+    setCurrentScreen(screen);
+  }, []);
+
+  useEffect(() => {
+    setNavigate(navigate);
+  }, [navigate, setNavigate]);
 
   const ScreenComponent = useMemo(() => {
     switch (currentScreen) {
@@ -48,7 +59,6 @@ export default function App() {
   }, [currentScreen])
 
   return (
-    <VoiceProvider setCurrentScreen={setCurrentScreen}>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-4">
         <div className="relative w-full max-w-sm h-[85vh] max-h-[900px] bg-background rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-700">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-700 rounded-b-xl z-20 flex items-center justify-center">
@@ -76,8 +86,16 @@ export default function App() {
 
         </div>
       </main>
-    </VoiceProvider>
   );
+}
+
+
+export default function App() {
+  return (
+    <VoiceProvider>
+      <AppContent />
+    </VoiceProvider>
+  )
 }
 
 const NavButton = ({ icon: Icon, label, screen, currentScreen, navigate }: { icon: React.ElementType, label: string, screen: Screen, currentScreen: Screen, navigate: (s: Screen) => void }) => (
