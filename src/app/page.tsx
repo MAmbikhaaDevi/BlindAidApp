@@ -1,3 +1,90 @@
-export default function Home() {
-  return <></>;
+"use client";
+
+import { useState, useMemo } from 'react';
+import { Home, Scan, FileText, Map, Settings, AlertTriangle } from 'lucide-react';
+import { VoiceProvider } from '@/contexts/voice-context';
+import { DashboardScreen } from '@/components/screens/dashboard';
+import { ObjectDetectionScreen } from '@/components/screens/object-detection';
+import { TextReaderScreen } from '@/components/screens/text-reader';
+import { NavigationScreen } from '@/components/screens/navigation';
+import { EmergencyScreen } from '@/components/screens/emergency';
+import { SettingsScreen } from '@/components/screens/settings';
+import { VoiceController } from '@/components/voice-controller';
+
+export type Screen = 'dashboard' | 'object-detection' | 'text-reader' | 'navigation' | 'emergency' | 'settings';
+
+export default function App() {
+  const [currentScreen, setCurrentScreen] = useState<Screen>('dashboard');
+
+  const ScreenComponent = useMemo(() => {
+    switch (currentScreen) {
+      case 'object-detection':
+        return ObjectDetectionScreen;
+      case 'text-reader':
+        return TextReaderScreen;
+      case 'navigation':
+        return NavigationScreen;
+      case 'emergency':
+        return EmergencyScreen;
+      case 'settings':
+        return SettingsScreen;
+      case 'dashboard':
+      default:
+        return DashboardScreen;
+    }
+  }, [currentScreen]);
+
+  const screenTitle = useMemo(() => {
+    switch (currentScreen) {
+      case 'object-detection': return "Object Detection";
+      case 'text-reader': return "Text Reader";
+      case 'navigation': return "Navigation";
+      case 'emergency': return "Emergency SOS";
+      case 'settings': return "Settings";
+      case 'dashboard':
+      default:
+        return "Visionary Assistant";
+    }
+  }, [currentScreen])
+
+  return (
+    <VoiceProvider setCurrentScreen={setCurrentScreen}>
+      <main className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-4">
+        <div className="relative w-full max-w-sm h-[85vh] max-h-[900px] bg-background rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-700">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-700 rounded-b-xl z-20 flex items-center justify-center">
+            <div className="w-3 h-3 rounded-full bg-gray-800 mr-4"></div>
+            <div className="w-16 h-2 rounded-full bg-gray-800"></div>
+          </div>
+          
+          <header className="absolute top-0 left-0 right-0 z-10 p-4 pt-10 bg-card/80 backdrop-blur-sm">
+            <h1 className="text-xl font-headline text-center font-bold text-primary">{screenTitle}</h1>
+          </header>
+
+          <div className="h-full overflow-y-auto pt-24 pb-32">
+            <ScreenComponent navigate={setCurrentScreen} />
+          </div>
+          
+          <VoiceController />
+
+          <footer className="absolute bottom-0 left-0 right-0 flex justify-around items-center p-2 border-t bg-card/80 backdrop-blur-sm">
+            <NavButton icon={Home} label="Home" screen="dashboard" currentScreen={currentScreen} navigate={setCurrentScreen} />
+            <NavButton icon={Scan} label="Detect" screen="object-detection" currentScreen={currentScreen} navigate={setCurrentScreen} />
+            <NavButton icon={FileText} label="Read" screen="text-reader" currentScreen={currentScreen} navigate={setCurrentScreen} />
+            <NavButton icon={Map} label="Navigate" screen="navigation" currentScreen={currentScreen} navigate={setCurrentScreen} />
+            <NavButton icon={AlertTriangle} label="SOS" screen="emergency" currentScreen={currentScreen} navigate={setCurrentScreen} />
+          </footer>
+
+        </div>
+      </main>
+    </VoiceProvider>
+  );
 }
+
+const NavButton = ({ icon: Icon, label, screen, currentScreen, navigate }: { icon: React.ElementType, label: string, screen: Screen, currentScreen: Screen, navigate: (s: Screen) => void }) => (
+    <button onClick={() => navigate(screen)} className={`flex flex-col items-center justify-center p-1 rounded-lg transition-colors duration-200 w-16 ${currentScreen === screen ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+      aria-label={label}
+    >
+      <Icon className="w-6 h-6" />
+      <span className="text-xs mt-1">{label}</span>
+    </button>
+  )
