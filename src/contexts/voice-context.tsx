@@ -40,8 +40,12 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
   const [transcript, setTranscript] = useState("");
   const [recognition, setRecognition] = useState<any | null>(null);
   const [isSupported, setIsSupported] = useState(false);
-  const [navigate, setNavigate] = useState<(screen: Screen) => void>(() => () => {});
+  const [navigate, setNavigateState] = useState<(screen: Screen) => void>(() => () => {});
   const { toast } = useToast();
+
+  const setNavigate = useCallback((fn: (screen: Screen) => void) => {
+    setNavigateState(() => fn);
+  }, []);
 
   const speak = useCallback((text: string, onEnd?: () => void) => {
     if (!text || typeof window === 'undefined' || !window.speechSynthesis) {
