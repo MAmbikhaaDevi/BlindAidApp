@@ -61,7 +61,7 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       setStatus("idle");
       if (onEnd) onEnd();
     };
-    utterance.onerror = (e) => {
+    utterance.onerror = () => {
       setStatus("idle");
       if (onEnd) onEnd();
       
@@ -87,8 +87,8 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
 
     if (lowerCaseCommand.includes("detect") || lowerCaseCommand.includes("look") || lowerCaseCommand.includes("scan")) {
       navigate('object-detection');
-    } else if (lowerCaseCommand.includes("emergency") || lowerCaseCommand.includes("help") || lowerCaseCommand.includes("sos")) {
-      navigate('emergency');
+    } else if (lowerCaseCommand.includes("emergency") || lowerCaseCommand.includes("help") || lowerCaseCommand.includes("call")) {
+      navigate('call');
     } else if (lowerCaseCommand.includes("home") || lowerCaseCommand.includes("dashboard")) {
       navigate('dashboard');
     } else if (lowerCaseCommand.includes("settings") || lowerCaseCommand.includes("preference")) {
@@ -171,6 +171,12 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleCommand]); 
 
+
+  useEffect(() => {
+    if (setNavigate) {
+        setNavigate(navigate);
+    }
+  }, [navigate, setNavigate]);
 
   const startListening = useCallback(() => {
     if (recognition && (status === "idle" || status === "speaking")) {

@@ -2,16 +2,16 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Home, Scan, AlertTriangle, Settings } from 'lucide-react';
+import { Home, Scan, Phone, Settings } from 'lucide-react';
 import { VoiceProvider } from '@/contexts/voice-context';
 import { DashboardScreen } from '@/components/screens/dashboard';
 import { ObjectDetectionScreen } from '@/components/screens/object-detection';
-import { EmergencyScreen } from '@/components/screens/emergency';
+import { CallScreen } from '@/components/screens/call';
 import { SettingsScreen } from '@/components/screens/settings';
 import { VoiceController } from '@/components/voice-controller';
 import { useVoice } from '@/contexts/voice-context';
 
-export type Screen = 'dashboard' | 'object-detection' | 'emergency' | 'settings';
+export type Screen = 'dashboard' | 'object-detection' | 'call' | 'settings';
 
 
 function AppContent() {
@@ -32,8 +32,8 @@ function AppContent() {
     switch (currentScreen) {
       case 'object-detection':
         return ObjectDetectionScreen;
-      case 'emergency':
-        return EmergencyScreen;
+      case 'call':
+        return CallScreen;
       case 'settings':
         return SettingsScreen;
       case 'dashboard':
@@ -45,7 +45,7 @@ function AppContent() {
   const screenTitle = useMemo(() => {
     switch (currentScreen) {
       case 'object-detection': return "Object Detection";
-      case 'emergency': return "Emergency SOS";
+      case 'call': return "Emergency Call";
       case 'settings': return "Settings";
       case 'dashboard':
       default:
@@ -74,7 +74,7 @@ function AppContent() {
           <footer className="absolute bottom-0 left-0 right-0 flex justify-around items-center p-2 border-t bg-card/80 backdrop-blur-sm">
             <NavButton icon={Home} label="Home" screen="dashboard" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Scan} label="Detect" screen="object-detection" currentScreen={currentScreen} navigate={setCurrentScreen} />
-            <NavButton icon={AlertTriangle} label="SOS" screen="emergency" currentScreen={currentScreen} navigate={setCurrentScreen} />
+            <NavButton icon={Phone} label="Call" screen="call" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Settings} label="Settings" screen="settings" currentScreen={currentScreen} navigate={setCurrentScreen} />
           </footer>
 
