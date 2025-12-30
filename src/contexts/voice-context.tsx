@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useToast } from "@/hooks/use-toast";
@@ -53,9 +54,11 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
         setStatus("idle");
         return;
     };
-    setStatus("speaking");
     
     const utterance = new SpeechSynthesisUtterance(text);
+    utterance.onstart = () => {
+      setStatus("speaking");
+    }
     utterance.onend = () => {
       setStatus("idle");
       if (onEnd) onEnd();
@@ -64,9 +67,15 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       console.error("Speech synthesis error", e);
       setStatus("idle");
       if (onEnd) onEnd();
+      
+      // Fallback for some browsers that error out for no reason
+      if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
+          console.log("Retrying speech synthesis");
+          setTimeout(() => window.speechSynthesis.speak(utterance), 100);
+      }
     };
 
-    window.speechSynthesis.cancel(); // Cancel any previous speech
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   }, []);
 
@@ -75,27 +84,30 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
 
     if (command.includes("detect") || command.includes("look") || command.includes("scan")) {
       navigate('object-detection');
+      speak("Navigating to Object Detection.");
     } else if (command.includes("read text") || command.includes("what does this say")) {
       navigate('text-reader');
+      speak("Navigating to Text Reader.");
     } else if (command.includes("navigate") || command.includes("directions") || command.includes("go to")) {
       navigate('navigation');
+      speak("Navigating to Navigation.");
     } else if (command.includes("emergency") || command.includes("help") || command.includes("sos")) {
       navigate('emergency');
+      speak("Navigating to Emergency SOS.");
     } else if (command.includes("settings")) {
       navigate('settings');
+      speak("Navigating to Settings.");
     } else if (command.includes("home") || command.includes("dashboard")) {
       navigate('dashboard');
+      speak("Returning to dashboard.");
     } else {
       const spokenResponse = `Sorry, I didn't understand the command '${command}'.`;
       toast({ title: "Unknown Command", description: `You said: "${command}"`});
       speak(spokenResponse, () => {
           setStatus("idle");
       });
-      return; // return early
+      return; 
     }
-    // If we matched a command, set status to idle after a short delay
-    setTimeout(() => setStatus("idle"), 100);
-
   }, [navigate, toast, speak]);
 
   useEffect(() => {
