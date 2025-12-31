@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, ScanLine, Camera, SwitchCamera, ListTree } from "lucide-react";
-import { describeImage, type DescribeImageOutput } from "@/ai/flows/describe-image-in-detail";
+import { describeImage } from "@/ai/flows/describe-image-in-detail";
 import { useVoice } from "@/contexts/voice-context";
 import type { Screen } from "@/app/page";
 import { useToast } from "@/hooks/use-toast";
@@ -23,33 +23,32 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [cameraFacingMode, setCameraFacingMode] = useState<"user" | "environment">("environment");
 
-  const stopCameraStream = () => {
+  const stopCameraStream = useCallback(() => {
     if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
         streamRef.current = null;
     }
-  };
+  }, []);
 
   const getCameraPermission = useCallback(async (facingMode: "user" | "environment") => {
-    stopCameraStream(); // Stop any existing stream
+    stopCameraStream();
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          streamRef.current = stream;
         }
+        streamRef.current = stream;
         setHasCameraPermission(true);
       } catch (error) {
         console.error('Error accessing camera:', error);
         setHasCameraPermission(false);
-        // If the desired camera fails, try the other one
         if (facingMode === 'environment') {
             toast({
                 title: 'Rear Camera Error',
                 description: "Could not access rear camera. Trying front camera.",
             });
-            setCameraFacingMode('user'); // This will trigger the useEffect to try again
+            setCameraFacingMode('user'); 
         } else {
             toast({
                 variant: 'destructive',
@@ -66,8 +65,7 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
         description: 'Your browser does not support camera access.',
       });
     }
-  }, [toast]);
-
+  }, [stopCameraStream, toast]);
 
   useEffect(() => {
     getCameraPermission(cameraFacingMode);
@@ -75,9 +73,7 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
     return () => {
         stopCameraStream();
     };
-  // We only want to re-run this when cameraFacingMode changes.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cameraFacingMode]);
+  }, [cameraFacingMode, getCameraPermission, stopCameraStream]);
   
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -93,7 +89,8 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
   };
 
   const handleDetection = async () => {
-    if (!videoRef.current || !hasCameraPermission) return;
+    if (!videoRef.current || !hasCameraPermission || isLoading) return;
+    
     setIsLoading(true);
     setDetectionResult(null);
     speak("Scanning your surroundings.");
@@ -102,9 +99,10 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     const context = canvas.getContext('2d');
+
     if (context) {
+      // Flip the image horizontally if using the front camera
       if (cameraFacingMode === 'user') {
-        // Flip the image horizontally for front camera
         context.translate(canvas.width, 0);
         context.scale(-1, 1);
       }
@@ -117,14 +115,16 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
         speak(`Detection complete. ${result.description}`);
       } catch (error) {
           console.error("Error identifying objects:", error);
-          const errorMessage = "Sorry, I couldn't analyze the scene.";
+          const errorMessage = "Sorry, I couldn't analyze the scene. Please try again.";
           speak(errorMessage);
-          toast({ title: "AI Error", description: errorMessage, variant: "destructive" });
+          toast({ title: "Analysis Error", description: errorMessage, variant: "destructive" });
       } finally {
           setIsLoading(false);
       }
     } else {
         setIsLoading(false);
+        speak("Could not process the image.");
+        toast({ title: "Error", description: "Could not process image from camera.", variant: "destructive"});
     }
   };
 
@@ -137,7 +137,7 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
              {isLoading && (
               <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center">
                 <ScanLine className="w-24 h-24 text-primary animate-pulse" style={{ animationDuration: '2s'}} />
-                <p className="text-primary font-bold mt-4 text-lg tracking-wider">Scanning...</p>
+                <p className="text-primary font-bold mt-4 text-lg tracking-wider">Analyzing...</p>
               </div>
             )}
             {hasCameraPermission === false && (
@@ -163,7 +163,7 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
         {isLoading ? "Scanning..." : "Scan Surroundings"}
       </Button>
 
-      {detectionResult && (
+      {detectionResult && !isLoading && (
          <Card className="fade-in">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-primary">
