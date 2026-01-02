@@ -21,7 +21,7 @@ const DescribeImageInputSchema = z.object({
 export type DescribeImageInput = z.infer<typeof DescribeImageInputSchema>;
 
 const DescribeImageOutputSchema = z.object({
-  description: z.string().describe('A detailed, conversational description of the image, as if you were talking to a visually impaired person. Mention objects, their colors, and their relative positions if possible (e.g., "on your right," "in front of you").'),
+  description: z.string().describe('A simple, clear, and direct description of the image. Identify the main objects and their positions.'),
 });
 export type DescribeImageOutput = z.infer<typeof DescribeImageOutputSchema>;
 
@@ -33,11 +33,9 @@ const describeImagePrompt = ai.definePrompt({
   name: 'describeImagePrompt',
   input: {schema: DescribeImageInputSchema},
   output: {schema: DescribeImageOutputSchema},
-  prompt: `You are an AI assistant designed to help a visually impaired user by describing their surroundings. Your tone should be friendly, clear, and conversational, as if you are talking directly to them.
+  prompt: `You are an AI assistant helping a visually impaired user. Describe the image clearly and concisely.
 
-Analyze the image and describe what you see in a natural, human-like way. For example, instead of just listing "a cup, a laptop", say something like "Right in front of you, there's a desk with a laptop on it, and to your right, there's a white coffee cup."
-
-Mention the main objects, their colors if they are distinct, and their position relative to the user if you can infer it. Be descriptive and helpful.
+Focus on what is most important in the image. Be direct. For example: "In front of you is a desk with a laptop on the left and a coffee cup on the right."
 
 Image: {{media url=photoDataUri}}`,
 });

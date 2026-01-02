@@ -101,7 +101,6 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
     const context = canvas.getContext('2d');
 
     if (context) {
-      // Flip the image horizontally if using the front camera
       if (cameraFacingMode === 'user') {
         context.translate(canvas.width, 0);
         context.scale(-1, 1);
