@@ -2,16 +2,18 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Home, Scan, Phone, Settings } from 'lucide-react';
+import { Home, Scan, Phone, Settings, Bluetooth } from 'lucide-react';
 import { VoiceProvider } from '@/contexts/voice-context';
+import { BluetoothProvider } from '@/contexts/bluetooth-context';
 import { DashboardScreen } from '@/components/screens/dashboard';
 import { ObjectDetectionScreen } from '@/components/screens/object-detection';
 import { CallScreen } from '@/components/screens/call';
 import { SettingsScreen } from '@/components/screens/settings';
+import { ConnectScreen } from '@/components/screens/connect';
 import { VoiceController } from '@/components/voice-controller';
 import { useVoice } from '@/contexts/voice-context';
 
-export type Screen = 'dashboard' | 'object-detection' | 'call' | 'settings';
+export type Screen = 'dashboard' | 'object-detection' | 'call' | 'settings' | 'connect';
 
 
 function AppContent() {
@@ -36,6 +38,8 @@ function AppContent() {
         return CallScreen;
       case 'settings':
         return SettingsScreen;
+      case 'connect':
+        return ConnectScreen;
       case 'dashboard':
       default:
         return DashboardScreen;
@@ -47,6 +51,7 @@ function AppContent() {
       case 'object-detection': return "Object Detection";
       case 'call': return "Emergency Call";
       case 'settings': return "Settings";
+      case 'connect': return "Connect Device";
       case 'dashboard':
       default:
         return "BLIND AID";
@@ -74,6 +79,7 @@ function AppContent() {
           <footer className="absolute bottom-0 left-0 right-0 flex justify-around items-center p-2 border-t bg-card/80 backdrop-blur-sm">
             <NavButton icon={Home} label="Home" screen="dashboard" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Scan} label="Detect" screen="object-detection" currentScreen={currentScreen} navigate={setCurrentScreen} />
+            <NavButton icon={Bluetooth} label="Device" screen="connect" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Phone} label="Call" screen="call" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Settings} label="Settings" screen="settings" currentScreen={currentScreen} navigate={setCurrentScreen} />
           </footer>
@@ -87,13 +93,15 @@ function AppContent() {
 export default function App() {
   return (
     <VoiceProvider>
-      <AppContent />
+      <BluetoothProvider>
+        <AppContent />
+      </BluetoothProvider>
     </VoiceProvider>
   )
 }
 
 const NavButton = ({ icon: Icon, label, screen, currentScreen, navigate }: { icon: React.ElementType, label: string, screen: Screen, currentScreen: Screen, navigate: (s: Screen) => void }) => (
-    <button onClick={() => navigate(screen)} className={`flex flex-col items-center justify-center p-1 rounded-lg transition-all duration-300 w-20 h-16 ${currentScreen === screen ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground hover:scale-105'}`}
+    <button onClick={() => navigate(screen)} className={`flex flex-col items-center justify-center p-1 rounded-lg transition-all duration-300 w-16 h-16 ${currentScreen === screen ? 'text-primary scale-110' : 'text-muted-foreground hover:text-foreground hover:scale-105'}`}
       aria-label={label}
     >
       <Icon className="w-7 h-7" />

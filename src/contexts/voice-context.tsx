@@ -93,6 +93,8 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
       navigate('dashboard');
     } else if (lowerCaseCommand.includes("settings") || lowerCaseCommand.includes("preference")) {
         navigate('settings');
+    } else if (lowerCaseCommand.includes("connect") || lowerCaseCommand.includes("device")) {
+      navigate('connect');
     } else if (lowerCaseCommand.includes("cancel") || lowerCaseCommand.includes("stop")) {
         speak("Cancelled.");
         setStatus('idle');
