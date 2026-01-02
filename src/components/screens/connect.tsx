@@ -1,14 +1,17 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Bluetooth, BluetoothConnected, BluetoothSearching, XCircle } from "lucide-react";
+import { Bluetooth, BluetoothConnected, BluetoothSearching, XCircle, Wifi } from "lucide-react";
 import { useVoice } from "@/contexts/voice-context";
 import { useBluetooth } from "@/contexts/bluetooth-context";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import type { Screen } from "@/app/page";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 interface ScreenProps {
   navigate: (screen: Screen) => void;
@@ -16,6 +19,7 @@ interface ScreenProps {
 
 export const ConnectScreen: React.FC<ScreenProps> = ({ navigate }) => {
   const { speak } = useVoice();
+  const { toast } = useToast();
   const {
     connect,
     disconnect,
@@ -30,7 +34,7 @@ export const ConnectScreen: React.FC<ScreenProps> = ({ navigate }) => {
       if (!isSupported) {
         speak("Bluetooth is not supported on this browser. Please use Chrome or Edge to connect a device.");
       } else if (device) {
-        speak("You are connected to a device. You can disconnect if you wish.");
+        speak("You are connected to a device. You can configure Wi-Fi or disconnect.");
       } else {
         speak("Connect to a hardware device. Say 'scan for devices' to begin pairing.");
       }
@@ -38,6 +42,15 @@ export const ConnectScreen: React.FC<ScreenProps> = ({ navigate }) => {
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [device, isSupported]);
+
+  const handleSendWifi = () => {
+    // In a real application, this would send the credentials over BLE
+    speak("Sending Wi-Fi credentials to the device.");
+    toast({
+      title: "Wi-Fi Credentials Sent",
+      description: "Your device should now attempt to connect to the Wi-Fi network. (This is a simulation)",
+    });
+  }
 
   const getStatusIcon = () => {
     if (device) return <BluetoothConnected className="w-20 h-20 text-green-500" />;
@@ -83,21 +96,29 @@ export const ConnectScreen: React.FC<ScreenProps> = ({ navigate }) => {
       )}
 
       {isSupported && device && (
-        <Button onClick={disconnect} variant="destructive" className="w-full h-16 text-lg">
-          Disconnect
-        </Button>
+         <div className="grid grid-cols-1 gap-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Wifi /> Configure Wi-Fi</CardTitle>
+                    <CardDescription>Send Wi-Fi credentials to your connected device.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 text-left">
+                    <div className="space-y-2">
+                        <Label htmlFor="ssid">Wi-Fi Name (SSID)</Label>
+                        <Input id="ssid" placeholder="Your Wi-Fi Network Name" />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input id="password" type="password" placeholder="Your Wi-Fi Password" />
+                    </div>
+                    <Button onClick={handleSendWifi} className="w-full">Send to Device</Button>
+                </CardContent>
+            </Card>
+            <Button onClick={disconnect} variant="destructive" className="w-full h-16 text-lg">
+                Disconnect
+            </Button>
+        </div>
       )}
-
-      <Card>
-        <CardHeader>
-          <CardTitle>What is this?</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <CardDescription>
-            This feature allows BLIND AID to connect with external hardware, like an ESP32 microcontroller, to provide physical feedback or read from sensors.
-          </CardDescription>
-        </CardContent>
-      </Card>
     </div>
   );
 };
