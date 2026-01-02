@@ -94,6 +94,10 @@ export const BluetoothProvider: React.FC<BluetoothProviderProps> = ({ children }
       if (err.name === 'NotFoundError') {
         setError("No devices found. Make sure your ESP32 is on and advertising.");
         speak("No devices were found. Please make sure your hardware device is turned on and nearby.");
+      } else if (err.name === 'SecurityError') {
+        const policyError = "Bluetooth is blocked by your browser's policy. This can happen in some development environments or if not served over HTTPS.";
+        setError(policyError);
+        speak(policyError);
       } else {
         setError(`Connection failed: ${err.message}`);
         speak("An error occurred while connecting to the device.");
