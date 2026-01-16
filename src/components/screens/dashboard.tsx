@@ -15,7 +15,7 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ navigate }) => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      speak("Welcome to BLIND AID. You are on the dashboard. You can say 'Detect objects', 'Emergency Call', or 'Settings'.");
+      speak("Welcome to BLIND AID. You are on the dashboard. You can say 'Detect objects', or 'Settings'.");
     }, 500);
     return () => clearTimeout(timeoutId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
