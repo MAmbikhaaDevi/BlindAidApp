@@ -1,0 +1,16 @@
+OrderID,Product,Category,Price,Quantity,OrderDate
+1,Laptop,Electronics,1200,1,2023-01-15
+2,Mouse,Electronics,25,2,2023-01-17
+3,Keyboard,Electronics,75,2,2023-01-19
+4,T-Shirt,Apparel,30,5,2023-01-20
+5,Jeans,Apparel,60,3,2023-01-22
+6,Coffee Maker,Home Goods,80,1,2023-01-25
+7,Blender,Home Goods,120,1,2023-01-28
+8,Desk Chair,Furniture,150,1,2023-02-01
+9,Notebook,Office Supplies,5,10,2023-02-03
+10,Pen,Office Supplies,2,20,2023-02-03
+11,Monitor,Electronics,300,2,2023-02-05
+12,Hoodie,Apparel,50,4,2023-02-07
+13,Picture Frame,Home Goods,15,5,2023-02-10
+14,Stapler,Office Supplies,7,3,2023-02-12
+15,Sofa,Furniture,800,1,2023-02-15
