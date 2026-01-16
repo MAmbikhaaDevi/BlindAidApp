@@ -1,0 +1,11 @@
+ProductID,ProductName,Category,StockQuantity,WarehouseLocation
+P1001,Laptop,Electronics,50,Warehouse A
+P1002,Smartphone,Electronics,150,Warehouse A
+P1003,Headphones,Electronics,300,Warehouse B
+P1004,Coffee Maker,Home Appliances,75,Warehouse C
+P1005,Blender,Home Appliances,120,Warehouse C
+P2001,T-Shirt,Apparel,500,Warehouse B
+P2002,Jeans,Apparel,400,Warehouse B
+P3001,The Great Gatsby,Books,200,Warehouse A
+P3002,To Kill a Mockingbird,Books,250,Warehouse A
+P1006,Desk Lamp,Furniture,90,Warehouse C
