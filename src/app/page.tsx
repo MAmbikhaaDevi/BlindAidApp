@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Home, ScanLine, Phone, Settings, Wifi, AlertTriangle } from 'lucide-react';
+import { Home, ScanLine, Phone, Settings, Wifi } from 'lucide-react';
 import { VoiceProvider } from '@/contexts/voice-context';
 import { BluetoothProvider } from '@/contexts/bluetooth-context';
 import { DashboardScreen } from '@/components/screens/dashboard';
@@ -12,9 +12,8 @@ import { SettingsScreen } from '@/components/screens/settings';
 import { ConnectScreen } from '@/components/screens/connect';
 import { VoiceController } from '@/components/voice-controller';
 import { useVoice } from '@/contexts/voice-context';
-import { EmergencyScreen } from '@/components/screens/emergency';
 
-export type Screen = 'dashboard' | 'object-detection' | 'call' | 'settings' | 'connect' | 'emergency';
+export type Screen = 'dashboard' | 'object-detection' | 'call' | 'settings' | 'connect';
 
 
 function AppContent() {
@@ -41,8 +40,6 @@ function AppContent() {
         return SettingsScreen;
       case 'connect':
         return ConnectScreen;
-      case 'emergency':
-        return EmergencyScreen;
       case 'dashboard':
       default:
         return DashboardScreen;
@@ -55,7 +52,6 @@ function AppContent() {
       case 'call': return "Emergency Call";
       case 'settings': return "Settings";
       case 'connect': return "Connect Device";
-      case 'emergency': return "Emergency SOS";
       case 'dashboard':
       default:
         return "BLIND AID";
@@ -83,8 +79,8 @@ function AppContent() {
           <footer className="absolute bottom-0 left-0 right-0 flex justify-around items-center p-2 border-t bg-card/80 backdrop-blur-sm">
             <NavButton icon={Home} label="Home" screen="dashboard" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={ScanLine} label="Detect" screen="object-detection" currentScreen={currentScreen} navigate={setCurrentScreen} />
+            <NavButton icon={Phone} label="Call" screen="call" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Wifi} label="Device" screen="connect" currentScreen={currentScreen} navigate={setCurrentScreen} />
-            <NavButton icon={AlertTriangle} label="SOS" screen="emergency" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Settings} label="Settings" screen="settings" currentScreen={currentScreen} navigate={setCurrentScreen} />
           </footer>
 
