@@ -42,7 +42,7 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ navigate }) => {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {features.map((feature, index) => (
           <button key={feature.title} onClick={() => navigate(feature.screen as Screen)} className="text-left" style={{ animationDelay: `${index * 100}ms`}}>
             <Card className="h-full hover:bg-primary/10 hover:border-primary transition-all duration-300 transform hover:scale-105">

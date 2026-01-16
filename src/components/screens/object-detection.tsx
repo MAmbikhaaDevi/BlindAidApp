@@ -132,7 +132,7 @@ export const ObjectDetectionScreen: React.FC<ScreenProps> = ({ navigate }) => {
     <div className="p-4 space-y-4 fade-in">
       <Card>
         <CardContent className="p-2">
-          <div className="relative w-full aspect-[9/16] rounded-lg overflow-hidden bg-gray-900">
+          <div className="relative w-full aspect-[9/16] md:aspect-video rounded-lg overflow-hidden bg-gray-900">
              <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline style={{ transform: cameraFacingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)' }}/>
              {isLoading && (
               <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center">

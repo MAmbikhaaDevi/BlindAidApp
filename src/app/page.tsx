@@ -51,7 +51,7 @@ function AppContent() {
 
   return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-gray-950 p-4">
-        <div className="relative w-full max-w-sm h-[85vh] max-h-[900px] bg-background rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-700/50">
+        <div className="relative w-full max-w-sm md:max-w-2xl h-[85vh] max-h-[900px] bg-background rounded-3xl shadow-2xl overflow-hidden border-4 border-gray-700/50">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-700 rounded-b-xl z-20 flex items-center justify-center">
             <div className="w-3 h-3 rounded-full bg-gray-800 mr-4"></div>
             <div className="w-16 h-2 rounded-full bg-gray-800"></div>
