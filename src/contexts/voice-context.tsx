@@ -87,8 +87,6 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
 
     if (lowerCaseCommand.includes("detect") || lowerCaseCommand.includes("look") || lowerCaseCommand.includes("scan")) {
       navigate('object-detection');
-    } else if (lowerCaseCommand.includes("emergency") || lowerCaseCommand.includes("help") || lowerCaseCommand.includes("call")) {
-      navigate('call');
     } else if (lowerCaseCommand.includes("home") || lowerCaseCommand.includes("dashboard")) {
       navigate('dashboard');
     } else if (lowerCaseCommand.includes("settings") || lowerCaseCommand.includes("preference")) {
@@ -98,22 +96,6 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
     } else if (lowerCaseCommand.includes("cancel") || lowerCaseCommand.includes("stop")) {
         speak("Cancelled.");
         setStatus('idle');
-    } else if (lowerCaseCommand.startsWith("call")) {
-        const contactName = lowerCaseCommand.replace("call", "").trim();
-        if (contactName) {
-            // This is a simulation. In a real app, you would look up the contact number.
-            if (contactName.includes("jane")) {
-                speak("Calling Jane Doe.");
-                toast({ title: "Calling Jane Doe", description: "Dialing 555-123-4567... (Simulation)" });
-            } else if (contactName.includes("emergency") || contactName.includes("911")) {
-                speak("Calling Emergency Services.");
-                toast({ title: "Calling Emergency Services", description: "Dialing 911... (Simulation)" });
-            } else {
-                speak(`Sorry, I couldn't find a contact named ${contactName}.`);
-            }
-        } else {
-            speak("Please specify who you want to call.");
-        }
     } else {
         try {
             const { response } = await answerQuestion({ query: command });
