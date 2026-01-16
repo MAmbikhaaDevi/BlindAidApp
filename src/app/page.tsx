@@ -2,17 +2,15 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Home, ScanLine, Settings, Wifi } from 'lucide-react';
+import { Home, ScanLine, Settings } from 'lucide-react';
 import { VoiceProvider } from '@/contexts/voice-context';
-import { BluetoothProvider } from '@/contexts/bluetooth-context';
 import { DashboardScreen } from '@/components/screens/dashboard';
 import { ObjectDetectionScreen } from '@/components/screens/object-detection';
 import { SettingsScreen } from '@/components/screens/settings';
-import { ConnectScreen } from '@/components/screens/connect';
 import { VoiceController } from '@/components/voice-controller';
 import { useVoice } from '@/contexts/voice-context';
 
-export type Screen = 'dashboard' | 'object-detection' | 'settings' | 'connect';
+export type Screen = 'dashboard' | 'object-detection' | 'settings';
 
 
 function AppContent() {
@@ -35,8 +33,6 @@ function AppContent() {
         return ObjectDetectionScreen;
       case 'settings':
         return SettingsScreen;
-      case 'connect':
-        return ConnectScreen;
       case 'dashboard':
       default:
         return DashboardScreen;
@@ -47,7 +43,6 @@ function AppContent() {
     switch (currentScreen) {
       case 'object-detection': return "Object Detection";
       case 'settings': return "Settings";
-      case 'connect': return "Connect Device";
       case 'dashboard':
       default:
         return "BLIND AID";
@@ -75,7 +70,6 @@ function AppContent() {
           <footer className="absolute bottom-0 left-0 right-0 flex justify-around items-center p-2 border-t bg-card/80 backdrop-blur-sm">
             <NavButton icon={Home} label="Home" screen="dashboard" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={ScanLine} label="Detect" screen="object-detection" currentScreen={currentScreen} navigate={setCurrentScreen} />
-            <NavButton icon={Wifi} label="Device" screen="connect" currentScreen={currentScreen} navigate={setCurrentScreen} />
             <NavButton icon={Settings} label="Settings" screen="settings" currentScreen={currentScreen} navigate={setCurrentScreen} />
           </footer>
 
@@ -88,9 +82,7 @@ function AppContent() {
 export default function App() {
   return (
     <VoiceProvider>
-      <BluetoothProvider>
-        <AppContent />
-      </BluetoothProvider>
+      <AppContent />
     </VoiceProvider>
   )
 }
