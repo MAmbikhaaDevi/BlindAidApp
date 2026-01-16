@@ -61,7 +61,7 @@ export const DashboardScreen: React.FC<ScreenProps> = ({ navigate }) => {
           </button>
         ))}
       </div>
-      <p className="text-center text-xs text-muted-foreground pt-4">created by NBHS Students</p>
+      <p className="text-center text-xs text-muted-foreground pt-4">Created By NBHS Students , Pune,2026.</p>
     </div>
   );
 };
