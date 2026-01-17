@@ -49,7 +49,7 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
   const speak = useCallback((text: string, onEnd?: () => void) => {
     if (!text || typeof window === 'undefined' || !window.speechSynthesis) {
         if (onEnd) onEnd();
-        if (status === 'speaking') setStatus("idle");
+        setStatus("idle");
         return;
     };
     
@@ -73,7 +73,7 @@ export const VoiceProvider: React.FC<VoiceProviderProps> = ({ children }) => {
 
     window.speechSynthesis.cancel();
     setTimeout(() => window.speechSynthesis.speak(utterance), 50);
-  }, [status]);
+  }, []);
   
   const setNavigate = useCallback((fn: (screen: Screen) => void) => {
     setNavigateState(() => fn);
